@@ -1,60 +1,50 @@
 import { useEffect, useRef } from "react"
-import patelUrl from "../../icons/petal.png"
 
-// 꽃잎의 이동 및 회전 속도 설정
-const X_SPEED = 0.6
-const X_SPEED_VARIANCE = 0.8
-
-const Y_SPEED = 0.4
-const Y_SPEED_VARIANCE = 0.4
-
-const FLIP_SPEED_VARIANCE = 0.02
+// 눈송이의 이동 속도 설정
+const X_SPEED = 0.15
+const X_SPEED_VARIANCE = 0.35
+const Y_SPEED = 0.45
+const Y_SPEED_VARIANCE = 0.65
+const SWAY_SPEED_VARIANCE = 0.025
 
 /**
- * 개별 꽃잎 객체를 관리하는 클래스입니다.
+ * 개별 눈송이 객체를 관리하는 클래스입니다.
  */
-class Petal {
+class Snowflake {
   x: number
   y: number
-  w: number = 0
-  h: number = 0
+  size: number = 0
   opacity: number = 0
-  flip: number = 0
   xSpeed: number = 0
   ySpeed: number = 0
-  flipSpeed: number = 0
+  sway: number = 0
+  swaySpeed: number = 0
 
   constructor(
     private canvas: HTMLCanvasElement,
     private ctx: CanvasRenderingContext2D,
-    private petalImg: HTMLImageElement,
   ) {
-    // 초기 위치 무작위 설정
     this.x = Math.random() * canvas.width
     this.y = Math.random() * canvas.height * 2 - canvas.height
-
     this.initialize()
   }
 
   /**
-   * 꽃잎의 크기, 투명도, 속도 등을 무작위로 초기화합니다.
+   * 눈송이의 크기, 투명도, 속도 등을 무작위로 초기화합니다.
    */
   initialize() {
-    this.w = 25 + Math.random() * 15
-    this.h = 20 + Math.random() * 10
-    this.opacity = this.w / 80
-    this.flip = Math.random()
-
+    this.size = 1.5 + Math.random() * 3.5
+    this.opacity = 0.35 + Math.random() * 0.5
+    this.sway = Math.random() * Math.PI * 2
     this.xSpeed = X_SPEED + Math.random() * X_SPEED_VARIANCE
     this.ySpeed = Y_SPEED + Math.random() * Y_SPEED_VARIANCE
-    this.flipSpeed = Math.random() * FLIP_SPEED_VARIANCE
+    this.swaySpeed = 0.005 + Math.random() * SWAY_SPEED_VARIANCE
   }
 
   /**
-   * 화면에 꽃잎을 그립니다.
+   * 눈송이를 그립니다.
    */
   draw() {
-    // 화면 밖으로 나갔을 경우 초기화 및 재배치
     if (this.y > this.canvas.height || this.x > this.canvas.width) {
       this.initialize()
 
@@ -67,35 +57,33 @@ class Petal {
         this.y = 0
       }
     }
+
     this.ctx.globalAlpha = this.opacity
-    this.ctx.drawImage(
-      this.petalImg,
-      this.x,
-      this.y,
-      this.w * (0.6 + Math.abs(Math.cos(this.flip)) / 3),
-      this.h * (0.8 + Math.abs(Math.sin(this.flip)) / 5),
-    )
+    this.ctx.fillStyle = "#ffffff"
+    this.ctx.beginPath()
+    this.ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2)
+    this.ctx.fill()
   }
 
   /**
-   * 꽃잎의 위치를 업데이트하고 다시 그립니다.
+   * 눈송이의 위치를 업데이트하고 다시 그립니다.
    */
   animate() {
-    this.x += this.xSpeed
+    this.x += this.xSpeed + Math.sin(this.sway) * 0.3
     this.y += this.ySpeed
-    this.flip += this.flipSpeed
+    this.sway += this.swaySpeed
     this.draw()
   }
 }
 
 /**
- * 배경에 꽃잎이 내리는 애니메이션 효과를 주는 컴포넌트입니다.
+ * 배경에 눈송이가 내리는 애니메이션 효과를 주는 컴포넌트입니다.
  *
  * @returns {JSX.Element} 배경 효과 컴포넌트
  */
 export const BGEffect = () => {
   const ref = useRef<HTMLCanvasElement>({} as HTMLCanvasElement)
-  const petalsRef = useRef<Petal[]>([])
+  const snowflakesRef = useRef<Snowflake[]>([])
   const resizeTimeoutRef = useRef(0)
   const animationFrameIdRef = useRef(0)
 
@@ -105,56 +93,54 @@ export const BGEffect = () => {
     canvas.height = window.innerHeight
 
     const ctx = canvas.getContext("2d") as CanvasRenderingContext2D
-    const petalImg = new Image()
-    petalImg.src = patelUrl
 
     /**
-     * 화면 크기에 따른 적절한 꽃잎 개수를 계산합니다.
+     * 화면 크기에 따른 적절한 눈송이 개수를 계산합니다.
      */
-    const getPetalNum = () => {
-      return Math.floor((window.innerWidth * window.innerHeight) / 30000)
+    const getSnowflakeNum = () => {
+      return Math.floor((window.innerWidth * window.innerHeight) / 18000)
     }
 
     /**
-     * 꽃잎들을 생성하고 초기화합니다.
+     * 눈송이들을 생성하고 초기화합니다.
      */
-    const initializePetals = () => {
-      const count = getPetalNum()
-      const petals = []
+    const initializeSnowflakes = () => {
+      const count = getSnowflakeNum()
+      const snowflakes = []
       for (let i = 0; i < count; i++) {
-        petals.push(new Petal(canvas, ctx, petalImg))
+        snowflakes.push(new Snowflake(canvas, ctx))
       }
-      petalsRef.current = petals
+      snowflakesRef.current = snowflakes
     }
 
-    initializePetals()
+    initializeSnowflakes()
 
     /**
-     * 매 프레임마다 꽃잎을 렌더링합니다.
+     * 매 프레임마다 눈송이를 렌더링합니다.
      */
     const render = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      petalsRef.current.forEach((petal) => petal.animate())
+      snowflakesRef.current.forEach((snowflake) => snowflake.animate())
       animationFrameIdRef.current = requestAnimationFrame(render)
     }
 
     render()
 
     /**
-     * 화면 크기 변경 시 캔버스 크기를 조정하고 꽃잎 개수를 조절합니다.
+     * 화면 크기 변경 시 캔버스 크기를 조정하고 눈송이 개수를 조절합니다.
      */
     const onResize = () => {
       clearTimeout(resizeTimeoutRef.current)
       resizeTimeoutRef.current = window.setTimeout(() => {
         canvas.width = window.innerWidth
         canvas.height = window.innerHeight
-        const newPetalNum = getPetalNum()
-        if (newPetalNum > petalsRef.current.length) {
-          for (let i = petalsRef.current.length; i < newPetalNum; i++) {
-            petalsRef.current.push(new Petal(canvas, ctx, petalImg))
+        const newSnowflakeNum = getSnowflakeNum()
+        if (newSnowflakeNum > snowflakesRef.current.length) {
+          for (let i = snowflakesRef.current.length; i < newSnowflakeNum; i++) {
+            snowflakesRef.current.push(new Snowflake(canvas, ctx))
           }
-        } else if (newPetalNum < petalsRef.current.length) {
-          petalsRef.current.splice(newPetalNum)
+        } else if (newSnowflakeNum < snowflakesRef.current.length) {
+          snowflakesRef.current.splice(newSnowflakeNum)
         }
       }, 100)
     }

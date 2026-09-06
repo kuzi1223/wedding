@@ -5,7 +5,7 @@ import {
   WEDDING_DATE,
   WEDDING_DATE_FORMAT,
 } from "../../const"
-import { COVER_IMAGE } from "../../images"
+import { COVER_IMAGE, COVER_IMAGE_2 } from "../../images"
 import { LazyDiv } from "../lazyDiv"
 
 const DAY_OF_WEEK = [
@@ -25,6 +25,14 @@ const DAY_OF_WEEK = [
  * @returns {JSX.Element} 커버 섹션
  */
 export const Cover = () => {
+  const [isSecondCover, setIsSecondCover] = useState(false)
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setIsSecondCover(true), 5000)
+
+    return () => window.clearTimeout(timer)
+  }, [])
+
   return (
     <LazyDiv className="card cover">
       {/* 상단 날짜 표시 */}
@@ -41,7 +49,16 @@ export const Cover = () => {
       </div>
       {/* 커버 이미지 */}
       <div className="image-wrapper">
-        <img src={COVER_IMAGE} alt="sample" />
+        <img
+          className={isSecondCover ? "is-hidden" : "is-visible"}
+          src={COVER_IMAGE}
+          alt="웨딩 커버 이미지"
+        />
+        <img
+          className={isSecondCover ? "is-visible" : "is-hidden"}
+          src={COVER_IMAGE_2}
+          alt="웨딩 커버 이미지"
+        />
       </div>
       <div className="subtitle">Save the date for the wedding of</div>
       {/* 이름 표시 */}
@@ -56,3 +73,4 @@ export const Cover = () => {
     </LazyDiv>
   )
 }
+import { useEffect, useState } from "react"
