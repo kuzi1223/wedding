@@ -6,7 +6,6 @@ import tmapIcon from "../../icons/tmap-icon.png"
 import LockIcon from "../../icons/lock-icon.svg?react"
 import UnlockIcon from "../../icons/unlock-icon.svg?react"
 import {
-  KMAP_PLACE_ID,
   LOCATION,
   NMAP_PLACE_ID,
   WEDDING_HALL_POSITION,
@@ -49,6 +48,14 @@ const NaverMap = () => {
       return "other"
     }
   }
+
+  const openKakaoMap = () => {
+    const [longitude, latitude] = WEDDING_HALL_POSITION
+    const destination = `${encodeURIComponent(LOCATION)},${latitude},${longitude}`
+    window.location.href = `https://map.kakao.com/link/map/${destination}`
+  }
+
+  const kakaoMapUrl = `https://map.kakao.com/link/map/${encodeURIComponent(LOCATION)},${WEDDING_HALL_POSITION[1]},${WEDDING_HALL_POSITION[0]}`
 
   useEffect(() => {
     // 네이버 지도 SDK가 로드되면 지도를 초기화합니다.
@@ -161,19 +168,23 @@ const NaverMap = () => {
             switch (checkDevice()) {
               case "ios":
               case "android":
-                if (kakao)
-                  kakao.Navi.start({
-                    name: LOCATION,
-                    x: WEDDING_HALL_POSITION[0],
-                    y: WEDDING_HALL_POSITION[1],
-                    coordType: "wgs84",
-                  })
+                if (kakao?.Navi) {
+                  try {
+                    kakao.Navi.start({
+                      name: LOCATION,
+                      x: WEDDING_HALL_POSITION[0],
+                      y: WEDDING_HALL_POSITION[1],
+                      coordType: "wgs84",
+                    })
+                    return
+                  } catch (error) {
+                    console.error("카카오내비 실행에 실패했습니다.", error)
+                  }
+                }
+                openKakaoMap()
                 break
               default:
-                window.open(
-                  `https://map.kakao.com/link/map/${KMAP_PLACE_ID}`,
-                  "_blank",
-                )
+                window.open(kakaoMapUrl, "_blank")
                 break
             }
           }}
