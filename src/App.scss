@@ -211,3 +211,7 @@ h2 {
 div.break {
   height: 1rem;
 }
+img {
+  -webkit-touch-callout: none;
+  user-select: none;
+}

@@ -19,7 +19,19 @@ import { STATIC_ONLY } from "./env"
  */
 function App() {
   return (
-    <div className="background">
+    <div
+      className="background"
+      onContextMenu={(event) => {
+        if ((event.target as HTMLElement).tagName === "IMG") {
+          event.preventDefault()
+        }
+      }}
+      onDragStart={(event) => {
+        if ((event.target as HTMLElement).tagName === "IMG") {
+          event.preventDefault()
+        }
+      }}
+    >
       {/* 배경 애니메이션 효과 (예: 꽃잎 내리기) */}
       <BGEffect />
       <div className="card-view">
