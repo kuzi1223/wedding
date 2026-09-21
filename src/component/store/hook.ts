@@ -4,8 +4,6 @@ import { useContext, useEffect } from "react"
 import { StoreContext } from "./context"
 import { KAKAO_SDK_JS_KEY, NAVER_MAP_CLIENT_ID } from "../../env"
 
-const baseUrl = import.meta.env.BASE_URL
-
 // 네이버 지도 및 카카오 SDK를 로드하기 위한 외부 스크립트 URL
 const NAVER_MAP_URL = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${NAVER_MAP_CLIENT_ID}`
 const KAKAO_SDK_URL = "https://t1.kakaocdn.net/kakao_js_sdk/2.7.1/kakao.min.js"
@@ -23,14 +21,36 @@ export const useNaver = () => {
       return
     }
 
-    // 스크립트가 아직 로드되지 않았으면 동적으로 추가
-    if (!document.querySelector(`script[src="${NAVER_MAP_URL}"]`)) {
-      const script = document.createElement("script")
+    const initializeNaver = () => {
+      const naverSdk = (window as any).naver
+      if (naverSdk?.maps) {
+        setNaver(naverSdk)
+      }
+    }
+
+    // SDK가 이미 로드된 경우 즉시 상태에 반영합니다.
+    if ((window as any).naver?.maps) {
+      initializeNaver()
+      return
+    }
+
+    // 기존 스크립트가 있으면 로드 완료를 기다리고, 없으면 새로 추가합니다.
+    let script = document.querySelector<HTMLScriptElement>(
+      `script[src="${NAVER_MAP_URL}"]`,
+    )
+    const shouldAppendScript = !script
+    if (!script) {
+      script = document.createElement("script")
       script.src = NAVER_MAP_URL
+    }
+
+    script.addEventListener("load", initializeNaver)
+    if (shouldAppendScript) {
       document.head.appendChild(script)
-      script.addEventListener("load", () => {
-        setNaver((window as any).naver)
-      })
+    }
+
+    return () => {
+      script?.removeEventListener("load", initializeNaver)
     }
   }, [setNaver])
 
@@ -50,19 +70,42 @@ export const useKakao = () => {
       return
     }
 
-    // 스크립트가 아직 로드되지 않았으면 동적으로 추가
-    if (!document.querySelector(`script[src="${KAKAO_SDK_URL}"]`)) {
-      const script = document.createElement("script")
-      script.addEventListener("load", () => {
-        // 카카오 SDK 초기화
-        if (!(window as any).Kakao.isInitialized()) {
-          ;(window as any).Kakao.init(KAKAO_SDK_JS_KEY)
-        }
-        setKakao((window as any).Kakao)
-      })
+    const initializeKakao = () => {
+      const kakaoSdk = (window as any).Kakao
+      if (!kakaoSdk) {
+        return
+      }
+
+      if (!kakaoSdk.isInitialized()) {
+        kakaoSdk.init(KAKAO_SDK_JS_KEY)
+      }
+      setKakao(kakaoSdk)
+    }
+
+    // SDK가 이미 로드된 경우 즉시 초기화합니다.
+    if ((window as any).Kakao) {
+      initializeKakao()
+      return
+    }
+
+    // 기존 스크립트가 있으면 로드 완료를 기다리고, 없으면 새로 추가합니다.
+    let script = document.querySelector<HTMLScriptElement>(
+      `script[src="${KAKAO_SDK_URL}"]`,
+    )
+    const shouldAppendScript = !script
+    if (!script) {
+      script = document.createElement("script")
       script.crossOrigin = "anonymous"
       script.src = KAKAO_SDK_URL
+    }
+
+    script.addEventListener("load", initializeKakao)
+    if (shouldAppendScript) {
       document.head.appendChild(script)
+    }
+
+    return () => {
+      script?.removeEventListener("load", initializeKakao)
     }
   }, [setKakao])
 

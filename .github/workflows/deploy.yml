@@ -22,12 +22,18 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Setup Environment Variables
+      - name: Apply Environment Variable Overrides
         run: |
-          echo "VITE_NAVER_MAP_CLIENT_ID=$VITE_NAVER_MAP_CLIENT_ID
-          VITE_KAKAO_SDK_JS_KEY=$VITE_KAKAO_SDK_JS_KEY
-          VITE_SERVER_URL=$VITE_SERVER_URL
-          VITE_STATIC_ONLY=$VITE_STATIC_ONLY" >> .env
+          append_if_set() {
+            if [ -n "$2" ]; then
+              printf '%s=%s\n' "$1" "$2" >> .env
+            fi
+          }
+
+          append_if_set VITE_NAVER_MAP_CLIENT_ID "$VITE_NAVER_MAP_CLIENT_ID"
+          append_if_set VITE_KAKAO_SDK_JS_KEY "$VITE_KAKAO_SDK_JS_KEY"
+          append_if_set VITE_SERVER_URL "$VITE_SERVER_URL"
+          append_if_set VITE_STATIC_ONLY "$VITE_STATIC_ONLY"
         env:
           VITE_NAVER_MAP_CLIENT_ID: ${{ secrets.VITE_NAVER_MAP_CLIENT_ID }}
           VITE_KAKAO_SDK_JS_KEY: ${{ secrets.VITE_KAKAO_SDK_JS_KEY }}
