@@ -412,11 +412,10 @@ export const Gallery = () => {
         <div className="content">
           <div className="photo-list">
             {GALLERY_IMAGES.map((image, idx) => (
-              <img
+              <button
+                type="button"
+                className="photo-item"
                 key={idx}
-                src={image}
-                alt={`${idx}`}
-                draggable={false}
                 onClick={() => {
                   if (statusRef.current === "stationary") {
                     if (idx !== slideRef.current) {
@@ -425,7 +424,9 @@ export const Gallery = () => {
                     modalState[1](false)
                   }
                 }}
-              />
+              >
+                <img src={image} alt={`${idx}`} draggable={false} />
+              </button>
             ))}
           </div>
           <div className="break" />
