@@ -3,6 +3,7 @@
 
 # production
 /build
+/original-images-backup
 
 # misc
 .DS_Store

@@ -92,7 +92,7 @@ src/images/
 
 SNS 공유용 미리보기 이미지는 다음 파일을 사용합니다.
 
-public/preview_image.png
+public/preview_image.webp
 
 이미지가 너무 크면 웹사이트 로딩 속도에 영향을 줄 수 있으므로 적절한 크기로 리사이징하는 것을 권장합니다.
 
@@ -158,7 +158,7 @@ npm run build
 
 wedding/
 ├── public/
-│   └── preview_image.png
+│   └── preview_image.webp
 ├── src/
 │   ├── component/
 │   ├── images/
