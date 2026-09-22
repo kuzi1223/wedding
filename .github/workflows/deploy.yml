@@ -34,11 +34,35 @@ jobs:
           append_if_set VITE_KAKAO_SDK_JS_KEY "$VITE_KAKAO_SDK_JS_KEY"
           append_if_set VITE_SERVER_URL "$VITE_SERVER_URL"
           append_if_set VITE_STATIC_ONLY "$VITE_STATIC_ONLY"
+          append_if_set VITE_BRIDE_PHONE "$VITE_BRIDE_PHONE"
+          append_if_set VITE_BRIDE_ACCOUNT "$VITE_BRIDE_ACCOUNT"
+          append_if_set VITE_BRIDE_FATHER_PHONE "$VITE_BRIDE_FATHER_PHONE"
+          append_if_set VITE_BRIDE_FATHER_ACCOUNT "$VITE_BRIDE_FATHER_ACCOUNT"
+          append_if_set VITE_BRIDE_MOTHER_PHONE "$VITE_BRIDE_MOTHER_PHONE"
+          append_if_set VITE_BRIDE_MOTHER_ACCOUNT "$VITE_BRIDE_MOTHER_ACCOUNT"
+          append_if_set VITE_GROOM_PHONE "$VITE_GROOM_PHONE"
+          append_if_set VITE_GROOM_ACCOUNT "$VITE_GROOM_ACCOUNT"
+          append_if_set VITE_GROOM_FATHER_PHONE "$VITE_GROOM_FATHER_PHONE"
+          append_if_set VITE_GROOM_FATHER_ACCOUNT "$VITE_GROOM_FATHER_ACCOUNT"
+          append_if_set VITE_GROOM_MOTHER_PHONE "$VITE_GROOM_MOTHER_PHONE"
+          append_if_set VITE_GROOM_MOTHER_ACCOUNT "$VITE_GROOM_MOTHER_ACCOUNT"
         env:
           VITE_NAVER_MAP_CLIENT_ID: ${{ secrets.VITE_NAVER_MAP_CLIENT_ID }}
           VITE_KAKAO_SDK_JS_KEY: ${{ secrets.VITE_KAKAO_SDK_JS_KEY }}
           VITE_SERVER_URL: ${{ vars.VITE_SERVER_URL }}
           VITE_STATIC_ONLY: ${{ vars.VITE_STATIC_ONLY }}
+          VITE_BRIDE_PHONE: ${{ secrets.VITE_BRIDE_PHONE }}
+          VITE_BRIDE_ACCOUNT: ${{ secrets.VITE_BRIDE_ACCOUNT }}
+          VITE_BRIDE_FATHER_PHONE: ${{ secrets.VITE_BRIDE_FATHER_PHONE }}
+          VITE_BRIDE_FATHER_ACCOUNT: ${{ secrets.VITE_BRIDE_FATHER_ACCOUNT }}
+          VITE_BRIDE_MOTHER_PHONE: ${{ secrets.VITE_BRIDE_MOTHER_PHONE }}
+          VITE_BRIDE_MOTHER_ACCOUNT: ${{ secrets.VITE_BRIDE_MOTHER_ACCOUNT }}
+          VITE_GROOM_PHONE: ${{ secrets.VITE_GROOM_PHONE }}
+          VITE_GROOM_ACCOUNT: ${{ secrets.VITE_GROOM_ACCOUNT }}
+          VITE_GROOM_FATHER_PHONE: ${{ secrets.VITE_GROOM_FATHER_PHONE }}
+          VITE_GROOM_FATHER_ACCOUNT: ${{ secrets.VITE_GROOM_FATHER_ACCOUNT }}
+          VITE_GROOM_MOTHER_PHONE: ${{ secrets.VITE_GROOM_MOTHER_PHONE }}
+          VITE_GROOM_MOTHER_ACCOUNT: ${{ secrets.VITE_GROOM_MOTHER_ACCOUNT }}
 
       - name: Use Node.js 22.x
         uses: actions/setup-node@v4

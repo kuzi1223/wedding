@@ -2,6 +2,20 @@ import dayjs from "dayjs"
 import utc from "dayjs/plugin/utc"
 import timezone from "dayjs/plugin/timezone"
 import "dayjs/locale/ko"
+import {
+  BRIDE_ACCOUNT,
+  BRIDE_FATHER_ACCOUNT,
+  BRIDE_FATHER_PHONE,
+  BRIDE_MOTHER_ACCOUNT,
+  BRIDE_MOTHER_PHONE,
+  BRIDE_PHONE,
+  GROOM_ACCOUNT,
+  GROOM_FATHER_ACCOUNT,
+  GROOM_FATHER_PHONE,
+  GROOM_MOTHER_ACCOUNT,
+  GROOM_MOTHER_PHONE,
+  GROOM_PHONE,
+} from "./env"
 
 // dayjs 설정: UTC 및 타임존 플러그인 확장, 한국어 로캘 설정
 dayjs.extend(utc)
@@ -81,20 +95,20 @@ export const BRIDE_INFO = [
   {
     relation: "신부",
     name: BRIDE_FULLNAME,
-    phone: "***REMOVED***",
-    account: "은행명 0000000000000",
+    phone: BRIDE_PHONE,
+    account: BRIDE_ACCOUNT,
   },
   {
     relation: "신부 아버지",
     name: BRIDE_FATHER,
-    phone: "010-0000-0000",
-    account: "은행명 00000000000",
+    phone: BRIDE_FATHER_PHONE,
+    account: BRIDE_FATHER_ACCOUNT,
   },
   {
     relation: "신부 어머니",
     name: BRIDE_MOTHER,
-    phone: "010-0000-0000",
-    account: "은행명 00000000000000",
+    phone: BRIDE_MOTHER_PHONE,
+    account: BRIDE_MOTHER_ACCOUNT,
   },
 ]
 
@@ -112,19 +126,19 @@ export const GROOM_INFO = [
   {
     relation: "신랑",
     name: GROOM_FULLNAME,
-    phone: "***REMOVED***",
-    account: "***REMOVED***",
+    phone: GROOM_PHONE,
+    account: GROOM_ACCOUNT,
   },
   {
     relation: "신랑 아버지",
     name: GROOM_FATHER,
-    phone: "***REMOVED***",
-    account: "은행명 000000000000",
+    phone: GROOM_FATHER_PHONE,
+    account: GROOM_FATHER_ACCOUNT,
   },
   {
     relation: "신랑 어머니",
     name: GROOM_MOTHER,
-    phone: "***REMOVED***",
-    account: "은행명 000000000000",
+    phone: GROOM_MOTHER_PHONE,
+    account: GROOM_MOTHER_ACCOUNT,
   },
 ]
