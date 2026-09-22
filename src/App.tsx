@@ -21,16 +21,10 @@ function App() {
   return (
     <div
       className="background"
-      onContextMenu={(event) => {
-        if ((event.target as HTMLElement).tagName === "IMG") {
-          event.preventDefault()
-        }
-      }}
-      onDragStart={(event) => {
-        if ((event.target as HTMLElement).tagName === "IMG") {
-          event.preventDefault()
-        }
-      }}
+      onContextMenu={(event) => event.preventDefault()}
+      onDragStart={(event) => event.preventDefault()}
+      onSelect={(event) => event.preventDefault()}
+      onCopy={(event) => event.preventDefault()}
     >
       {/* 배경 애니메이션 효과 (예: 꽃잎 내리기) */}
       <BGEffect />

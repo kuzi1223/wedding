@@ -97,6 +97,9 @@ body {
 * {
   box-sizing: border-box;
   color: var(--dark-color);
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
   user-select: none;
 }
 
