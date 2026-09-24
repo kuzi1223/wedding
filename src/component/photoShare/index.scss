@@ -1,0 +1,52 @@
+.photo-share {
+  .description,
+  .hint,
+  .empty {
+    margin: 0;
+    text-align: center;
+  }
+
+  .description {
+    margin-bottom: 1.25rem;
+  }
+
+  .hint,
+  .empty {
+    color: #777;
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  .hint {
+    margin-top: 0.75rem;
+  }
+
+  .photo-input {
+    display: none;
+  }
+
+  .photo-share-heading {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.35rem;
+
+    a {
+      aspect-ratio: 1;
+      overflow: hidden;
+    }
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+}
