@@ -57,6 +57,7 @@
 
     .photo-delete {
       position: absolute;
+      z-index: 4;
       right: 0.25rem;
       bottom: 0.25rem;
       border: 0;
@@ -66,6 +67,8 @@
       font: inherit;
       font-size: 0.7rem;
       padding: 0.2rem 0.35rem;
+      cursor: pointer;
+      pointer-events: auto;
     }
   }
 
