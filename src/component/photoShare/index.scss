@@ -37,8 +37,14 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 0.35rem;
 
-    a {
+    .photo-item {
+      position: relative;
       aspect-ratio: 1;
+    }
+
+    a {
+      display: block;
+      height: 100%;
       overflow: hidden;
     }
 
@@ -47,6 +53,57 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+
+    .photo-delete {
+      position: absolute;
+      right: 0.25rem;
+      bottom: 0.25rem;
+      border: 0;
+      border-radius: 0.2rem;
+      background: rgba(0, 0, 0, 0.65);
+      color: white;
+      font: inherit;
+      font-size: 0.7rem;
+      padding: 0.2rem 0.35rem;
+    }
+  }
+
+  .turnstile-widget {
+    height: 0;
+    overflow: hidden;
+  }
+
+  .photo-manager {
+    margin-top: 1rem;
+    text-align: right;
+
+    button {
+      border: 0;
+      background: none;
+      color: #777;
+      font: inherit;
+      font-size: 0.75rem;
+      text-decoration: underline;
+    }
+
+    label,
+    input,
+    p {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 0.5rem;
+      text-align: left;
+      color: #777;
+      font-size: 0.75rem;
+    }
+
+    input {
+      border: 1px solid #ddd;
+      border-radius: 0.2rem;
+      padding: 0.5rem;
+      color: inherit;
     }
   }
 }
