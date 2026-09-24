@@ -75,10 +75,14 @@
   }
 
   .photo-manager {
+    position: relative;
+    z-index: 3;
     margin-top: 1rem;
     text-align: right;
 
     button {
+      position: relative;
+      z-index: 3;
       border: 0;
       background: none;
       color: #777;
@@ -100,6 +104,8 @@
     }
 
     input {
+      position: relative;
+      z-index: 3;
       border: 1px solid #ddd;
       border-radius: 0.2rem;
       padding: 0.5rem;
