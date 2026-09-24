@@ -6,6 +6,7 @@ import { Modal } from "../modal"
 import "./index.scss"
 
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024
+const MAX_UPLOAD_COUNT = 20
 const PAGE_SIZE = 30
 const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY
 
@@ -36,13 +37,14 @@ export const PhotoShare = () => {
   const inputRef = useRef<HTMLInputElement>(null)
   const turnstileContainerRef = useRef<HTMLDivElement>(null)
   const turnstileWidgetRef = useRef<string | null>(null)
-  const selectedFileRef = useRef<File | null>(null)
+  const selectedFilesRef = useRef<File[]>([])
   const [photos, setPhotos] = useState<Photo[]>([])
   const [allPhotos, setAllPhotos] = useState<Photo[]>([])
   const [total, setTotal] = useState(0)
   const [featuredIndex, setFeaturedIndex] = useState(0)
   const [uploading, setUploading] = useState(false)
   const [checking, setChecking] = useState(false)
+  const [uploadProgress, setUploadProgress] = useState<{ completed: number; total: number } | null>(null)
   const [showManager, setShowManager] = useState(false)
   const [adminPassword, setAdminPassword] = useState("")
   const [deletingPhotoId, setDeletingPhotoId] = useState<string | null>(null)
@@ -86,25 +88,38 @@ export const PhotoShare = () => {
     }
   }
 
-  const uploadPhoto = useCallback(async (file: File, turnstileToken: string) => {
-    setUploading(true)
+  const uploadNextPhoto = useCallback(async (turnstileToken: string) => {
+    const file = selectedFilesRef.current[0]
+    if (!file) return
     try {
       const formData = new FormData()
       formData.append("file", file)
       formData.append("cf-turnstile-response", turnstileToken)
       const response = await fetch(`${SERVER_URL}/photos`, { method: "POST", body: formData })
       if (!response.ok) throw new Error(await response.text())
+      selectedFilesRef.current.shift()
+      setUploadProgress((progress) => progress && { ...progress, completed: progress.completed + 1 })
+
+      if (selectedFilesRef.current.length > 0 && turnstileWidgetRef.current && window.turnstile) {
+        window.turnstile.reset(turnstileWidgetRef.current)
+        window.turnstile.execute(turnstileWidgetRef.current)
+        return
+      }
+
       await loadPhotos()
-      alert("사진이 공유 사진첩에 등록되었습니다.")
+      alert("선택한 사진이 공유 사진첩에 등록되었습니다.")
     } catch (error) {
       console.error("Error uploading shared photo:", error)
-      alert("사진 업로드에 실패했습니다. 잠시 후 다시 시도해주세요.")
+      selectedFilesRef.current = []
+      alert("사진 업로드에 실패했습니다. 업로드된 사진은 유지됩니다.")
     } finally {
-      setUploading(false)
-      setChecking(false)
-      selectedFileRef.current = null
-      if (inputRef.current) inputRef.current.value = ""
-      if (turnstileWidgetRef.current && window.turnstile) window.turnstile.reset(turnstileWidgetRef.current)
+      if (selectedFilesRef.current.length === 0) {
+        setUploading(false)
+        setChecking(false)
+        setUploadProgress(null)
+        if (inputRef.current) inputRef.current.value = ""
+        if (turnstileWidgetRef.current && window.turnstile) window.turnstile.reset(turnstileWidgetRef.current)
+      }
     }
   }, [loadPhotos])
 
@@ -119,12 +134,14 @@ export const PhotoShare = () => {
         execution: "execute",
         appearance: "execute",
         callback: (token) => {
-          const file = selectedFileRef.current
-          if (file) void uploadPhoto(file, token)
+          if (selectedFilesRef.current.length > 0) void uploadNextPhoto(token)
         },
         "expired-callback": () => setChecking(false),
         "error-callback": () => {
+          selectedFilesRef.current = []
+          setUploading(false)
           setChecking(false)
+          setUploadProgress(null)
           alert("사진 업로드 확인에 실패했습니다. 잠시 후 다시 시도해주세요.")
         },
       })
@@ -142,23 +159,29 @@ export const PhotoShare = () => {
       turnstileWidgetRef.current = null
       script.remove()
     }
-  }, [uploadPhoto])
+  }, [uploadNextPhoto])
 
-  const verifyAndUploadPhoto = (file: File) => {
-    if (!file.type.match(/^image\/(jpeg|png|webp)$/)) {
+  const verifyAndUploadPhotos = (files: File[]) => {
+    if (files.length > MAX_UPLOAD_COUNT) {
+      alert(`사진은 한 번에 최대 ${MAX_UPLOAD_COUNT}장까지 올릴 수 있습니다.`)
+      return
+    }
+    if (files.some((file) => !file.type.match(/^image\/(jpeg|png|webp)$/))) {
       alert("JPG, PNG, WebP 사진만 올릴 수 있습니다.")
       return
     }
-    if (file.size > MAX_PHOTO_BYTES) {
-      alert("사진은 10MB 이하만 올릴 수 있습니다.")
+    if (files.some((file) => file.size > MAX_PHOTO_BYTES)) {
+      alert("모든 사진은 10MB 이하여야 합니다.")
       return
     }
     if (!turnstileWidgetRef.current || !window.turnstile) {
       alert("사진 업로드 확인을 준비 중입니다. 잠시 후 다시 시도해주세요.")
       return
     }
-    selectedFileRef.current = file
+    selectedFilesRef.current = files
+    setUploading(true)
     setChecking(true)
+    setUploadProgress({ completed: 0, total: files.length })
     window.turnstile.execute(turnstileWidgetRef.current)
   }
 
@@ -196,17 +219,18 @@ export const PhotoShare = () => {
         className="photo-input"
         type="file"
         accept="image/jpeg,image/png,image/webp"
+        multiple
         disabled={uploading || checking}
         onChange={(event) => {
-          const file = event.target.files?.[0]
-          if (file) verifyAndUploadPhoto(file)
+          const files = Array.from(event.target.files ?? [])
+          if (files.length > 0) verifyAndUploadPhotos(files)
         }}
       />
       <div ref={turnstileContainerRef} className="turnstile-widget" aria-hidden="true" />
       <Button disabled={uploading || checking} onClick={() => inputRef.current?.click()}>
-        {uploading ? "사진 올리는 중..." : checking ? "사진 확인 중..." : "사진 올리기"}
+        {uploading && uploadProgress ? `사진 올리는 중... (${uploadProgress.completed}/${uploadProgress.total})` : checking ? "사진 확인 중..." : "사진 올리기"}
       </Button>
-      <p className="hint">JPG, PNG, WebP · 최대 10MB</p>
+      <p className="hint">JPG, PNG, WebP · 사진당 최대 10MB · 한 번에 최대 20장</p>
       <div className="break" />
       <div className="photo-share-heading"><span>공유 사진첩</span><span>{total}장</span></div>
       {photos.length > 0 ? (
