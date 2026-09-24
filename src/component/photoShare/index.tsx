@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { SERVER_URL } from "../../env"
 import { Button } from "../button"
 import { LazyDiv } from "../lazyDiv"
+import { Modal } from "../modal"
 import "./index.scss"
 
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024
@@ -37,12 +38,15 @@ export const PhotoShare = () => {
   const turnstileWidgetRef = useRef<string | null>(null)
   const selectedFileRef = useRef<File | null>(null)
   const [photos, setPhotos] = useState<Photo[]>([])
+  const [allPhotos, setAllPhotos] = useState<Photo[]>([])
   const [total, setTotal] = useState(0)
+  const [featuredIndex, setFeaturedIndex] = useState(0)
   const [uploading, setUploading] = useState(false)
   const [checking, setChecking] = useState(false)
   const [showManager, setShowManager] = useState(false)
   const [adminPassword, setAdminPassword] = useState("")
   const [deletingPhotoId, setDeletingPhotoId] = useState<string | null>(null)
+  const photoModalState = useState(false)
 
   const loadPhotos = useCallback(async () => {
     try {
@@ -57,6 +61,30 @@ export const PhotoShare = () => {
   }, [])
 
   useEffect(() => { loadPhotos() }, [loadPhotos])
+
+  useEffect(() => {
+    if (featuredIndex >= photos.length) setFeaturedIndex(0)
+  }, [featuredIndex, photos.length])
+
+  const loadAllPhotos = async () => {
+    const all: Photo[] = []
+    for (let offset = 0; offset < total; offset += 50) {
+      const response = await fetch(`${SERVER_URL}/photos?offset=${offset}&limit=50`)
+      if (!response.ok) throw new Error(response.statusText)
+      const data = await response.json()
+      all.push(...data.photos)
+    }
+    setAllPhotos(all)
+  }
+
+  const openAllPhotos = async () => {
+    photoModalState[1](true)
+    try {
+      await loadAllPhotos()
+    } catch (error) {
+      console.error("Error loading all shared photos:", error)
+    }
+  }
 
   const uploadPhoto = useCallback(async (file: File, turnstileToken: string) => {
     setUploading(true)
@@ -156,7 +184,9 @@ export const PhotoShare = () => {
 
   if (!SERVER_URL) return null
 
-  return (
+  const featuredPhoto = photos[featuredIndex]
+
+  return <>
     <LazyDiv className="card photo-share">
       <h2 className="english">Photo Share</h2>
       <div className="break" />
@@ -180,22 +210,21 @@ export const PhotoShare = () => {
       <div className="break" />
       <div className="photo-share-heading"><span>공유 사진첩</span><span>{total}장</span></div>
       {photos.length > 0 ? (
-        <div className="photo-grid">
-          {photos.map((photo) => (
-            <div key={photo.id} className="photo-item">
-              <a href={`${SERVER_URL}/photos/${photo.id}`} target="_blank" rel="noreferrer" aria-label="공유 사진 크게 보기">
-                <img src={`${SERVER_URL}/photos/${photo.id}`} alt="하객이 공유한 사진" loading="lazy" />
-              </a>
-              {showManager && adminPassword && (
-                <button className="photo-delete" type="button" disabled={deletingPhotoId === photo.id} onClick={() => void deletePhoto(photo.id)}>
-                  {deletingPhotoId === photo.id ? "삭제 중" : "삭제"}
-                </button>
-              )}
-            </div>
-          ))}
+        <div className="photo-carousel">
+          <img src={`${SERVER_URL}/photos/${featuredPhoto.id}`} alt="하객이 공유한 사진" />
+          {photos.length > 1 && <>
+            <button className="photo-nav previous" type="button" aria-label="이전 사진" onClick={() => setFeaturedIndex((featuredIndex + photos.length - 1) % photos.length)}>‹</button>
+            <button className="photo-nav next" type="button" aria-label="다음 사진" onClick={() => setFeaturedIndex((featuredIndex + 1) % photos.length)}>›</button>
+          </>}
+          {showManager && adminPassword && (
+            <button className="photo-delete" type="button" disabled={deletingPhotoId === featuredPhoto.id} onClick={() => void deletePhoto(featuredPhoto.id)}>
+              {deletingPhotoId === featuredPhoto.id ? "삭제 중" : "삭제"}
+            </button>
+          )}
         </div>
       ) : <p className="empty">아직 공유된 사진이 없어요. 첫 사진을 올려주세요.</p>}
       {total > photos.length && <p className="hint">최근 사진 {photos.length}장만 표시합니다.</p>}
+      {photos.length > 0 && <Button onClick={() => void openAllPhotos()}>사진 전체보기</Button>}
       <div className="photo-manager">
         <button type="button" onClick={() => setShowManager((value) => !value)}>{showManager ? "사진 관리 닫기" : "사진 관리"}</button>
         {showManager && <>
@@ -205,5 +234,18 @@ export const PhotoShare = () => {
         </>}
       </div>
     </LazyDiv>
-  )
+    <Modal modalState={photoModalState} className="shared-photo-modal" closeOnClickBackground={true}>
+      <div className="header"><div className="title">공유 사진첩 전체보기</div></div>
+      <div className="content">
+        <div className="all-photo-list">
+          {allPhotos.map((photo) => (
+            <a key={photo.id} href={`${SERVER_URL}/photos/${photo.id}`} target="_blank" rel="noreferrer" aria-label="공유 사진 크게 보기">
+              <img src={`${SERVER_URL}/photos/${photo.id}`} alt="하객이 공유한 사진" loading="lazy" />
+            </a>
+          ))}
+        </div>
+      </div>
+      <div className="footer"><Button buttonStyle="style2" onClick={() => photoModalState[1](false)}>닫기</Button></div>
+    </Modal>
+  </>
 }
