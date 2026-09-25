@@ -112,6 +112,23 @@ export const BRIDE_INFO = [
   },
 ]
 
+/**
+ * 신부측 계좌 표시 정보
+ * 부모님 계좌는 아버지 명의의 대표 계좌 하나만 표시합니다.
+ */
+export const BRIDE_ACCOUNT_INFO = [
+  {
+    relation: "신부",
+    name: BRIDE_FULLNAME,
+    account: BRIDE_ACCOUNT,
+  },
+  {
+    relation: "신부 부모님",
+    name: `${BRIDE_FATHER} · ${BRIDE_MOTHER}`,
+    account: BRIDE_FATHER_ACCOUNT,
+  },
+]
+
 // 신랑 정보 설정
 export const GROOM_FULLNAME = "최휘재"
 export const GROOM_FIRSTNAME = "휘재"
