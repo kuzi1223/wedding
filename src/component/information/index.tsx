@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { BRIDE_ACCOUNT_INFO, GROOM_INFO } from "../../const"
+import { BRIDE_ACCOUNT_INFO, GROOM_ACCOUNT_INFO } from "../../const"
 import { STATIC_ONLY } from "../../env"
 import { Button } from "../button"
 import { LazyDiv } from "../lazyDiv"
@@ -80,7 +80,7 @@ export const Information2 = () => {
           </div>
         </div>
         <div className="content">
-          {(isGroom ? GROOM_INFO : BRIDE_ACCOUNT_INFO)
+          {(isGroom ? GROOM_ACCOUNT_INFO : BRIDE_ACCOUNT_INFO)
             .filter(({ account }) => !!account)
             .map(({ relation, name, account }) => (
               <div className="account-info" key={relation}>

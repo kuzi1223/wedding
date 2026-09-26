@@ -159,3 +159,20 @@ export const GROOM_INFO = [
     account: GROOM_MOTHER_ACCOUNT,
   },
 ]
+
+/**
+ * 신랑측 계좌 표시 정보
+ * 부모님 계좌는 아버지 명의의 대표 계좌 하나만 표시합니다.
+ */
+export const GROOM_ACCOUNT_INFO = [
+  {
+    relation: "신랑",
+    name: GROOM_FULLNAME,
+    account: GROOM_ACCOUNT,
+  },
+  {
+    relation: "신랑 부모님",
+    name: `${GROOM_FATHER} · ${GROOM_MOTHER}`,
+    account: GROOM_FATHER_ACCOUNT,
+  },
+]
