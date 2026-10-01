@@ -64,7 +64,9 @@ export const Cover = () => {
       {/* 이름 표시 */}
       <div className="names">
         {GROOM_FULLNAME}
-        <div className="divider" />
+        <span className="heart" aria-hidden="true">
+          ♥
+        </span>
         {BRIDE_FULLNAME}
       </div>
       {/* 예식 정보 (포맷팅된 날짜 및 장소) */}
