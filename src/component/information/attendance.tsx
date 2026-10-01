@@ -208,6 +208,11 @@ const AttendanceFormModal = ({ onClose }: { onClose: () => void }) => {
             return
           }
 
+          const confirmed = window.confirm(
+            "입력한 내용으로 참석 의사를 전달하시겠습니까?",
+          )
+          if (!confirmed) return
+
           // 서버에 데이터 전송
           const res = await fetch(`${SERVER_URL}/attendance`, {
             method: "POST",
