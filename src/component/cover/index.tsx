@@ -1,7 +1,7 @@
 import {
   BRIDE_FULLNAME,
+  COVER_LOCATION,
   GROOM_FULLNAME,
-  LOCATION,
   WEDDING_DATE,
   WEDDING_DATE_FORMAT,
 } from "../../const"
@@ -69,7 +69,7 @@ export const Cover = () => {
       </div>
       {/* 예식 정보 (포맷팅된 날짜 및 장소) */}
       <div className="info">{WEDDING_DATE.format(WEDDING_DATE_FORMAT)}</div>
-      <div className="info">{LOCATION}</div>
+      <div className="info">{COVER_LOCATION}</div>
     </LazyDiv>
   )
 }

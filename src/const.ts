@@ -49,6 +49,11 @@ export const HOLIDAYS = []
 export const LOCATION = "청주 벨리스웨딩홀"
 
 /**
+ * 첫 화면에 표시할 예식장 및 홀 명칭
+ */
+export const COVER_LOCATION = "청주 벨리스웨딩홀 세레나홀"
+
+/**
  * 예식 장소 상세 주소
  */
 export const LOCATION_ADDRESS = "충북 청주시 서원구 남이면 청남로 1759"
