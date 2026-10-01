@@ -208,8 +208,11 @@ const AttendanceFormModal = ({ onClose }: { onClose: () => void }) => {
             return
           }
 
+          const sideLabel = side === "groom" ? "신랑 측" : "신부 측"
+          const mealLabel =
+            meal === "yes" ? "예정" : meal === "undecided" ? "미정" : "불참"
           const confirmed = window.confirm(
-            "입력한 내용으로 참석 의사를 전달하시겠습니까?",
+            `아래 내용으로 참석 의사를 전달하시겠습니까?\n\n구분: ${sideLabel}\n성함: ${name}\n식사: ${mealLabel}\n참석 인원: ${count}명`,
           )
           if (!confirmed) return
 
